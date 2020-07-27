@@ -48,6 +48,21 @@ namespace GeolocationProcessing
             }
         }
 
+        private void SaveImage_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Image Files(*.JPG)|*.JPG";
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string filePath = saveFileDialog.FileName;
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)ResultImage.Source));
+                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                encoder.Save(stream);
+            }
+        }
+
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
