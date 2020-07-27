@@ -8,19 +8,25 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280">
     <Grid>
-        <Menu Height="25" VerticalAlignment="Top">
-            <MenuItem Header="File">
-                <MenuItem Header="Open" Click="BroseFileButton_Click">
-                </MenuItem>
-                <Separator/>
-                <MenuItem Header="Exit" Click="Exit_Click"></MenuItem>
-            </MenuItem>
-        </Menu>
-        
-        <utils:ZoomBorder x:Name="Border" Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="1000" Height="600">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="358*"/>
+            <RowDefinition Height="331*"/>
+        </Grid.RowDefinitions>
+        <utils:ZoomBorder x:Name="Border" Background="WhiteSmoke" BorderBrush="Black" BorderThickness="2" Margin="-3,25,272,-2" Grid.RowSpan="2">
             <Grid>
                 <Image x:Name="ResultImage"/>
             </Grid>
         </utils:ZoomBorder>
+
+        <Menu Background="AliceBlue" Height="25" VerticalAlignment="Top">
+            <MenuItem Header="File" Height="25">
+                <MenuItem Header="Open" Click="BroseFileButton_Click"/>
+                <Separator/>
+                <MenuItem Header="Exit" Click="Exit_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <Border Background="WhiteSmoke" BorderBrush="Black" BorderThickness="2" Grid.RowSpan="2" HorizontalAlignment="Right" Width="274" Margin="0,25,0,0"/>
+
     </Grid>
 </Window>
