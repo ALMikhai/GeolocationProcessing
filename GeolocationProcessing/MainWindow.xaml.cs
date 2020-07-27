@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,11 +31,20 @@ namespace GeolocationProcessing
             if (openFileDialog.ShowDialog() == true)
             {
                 string selectedFileName = openFileDialog.FileName;
-                BitmapImage bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(selectedFileName);
-                bitmap.EndInit();
-                ResultImage.Source = bitmap;
+                var geo = new Geolocation(selectedFileName);
+                var bitmap = geo.CreateImage();
+
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    bitmap.Save(memory, ImageFormat.Png);
+                    memory.Position = 0;
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = memory;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+                    ResultImage.Source = bitmapImage;
+                }
             }
         }
 
