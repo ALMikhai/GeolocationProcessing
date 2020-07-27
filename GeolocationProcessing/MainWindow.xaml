@@ -4,9 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GeolocationProcessing"
+        xmlns:utils="clr-namespace:GeolocationProcessing.Utils"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="720" Width="1280">
     <Grid>
+        <Menu Height="25" VerticalAlignment="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Open" Click="BroseFileButton_Click">
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Exit" Click="Exit_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
         
+        <utils:ZoomBorder x:Name="Border" Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="1000" Height="600">
+            <Grid>
+                <Image x:Name="ResultImage"/>
+            </Grid>
+        </utils:ZoomBorder>
     </Grid>
 </Window>
