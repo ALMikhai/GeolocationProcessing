@@ -62,6 +62,7 @@
     <Compile Include="SM\LogState.cs" />
     <Compile Include="SM\State.cs" />
     <Compile Include="SM\StateMachine.cs" />
+    <Compile Include="Utils\DoubleTextBox.cs" />
     <Compile Include="Utils\ZoomBorder.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -24,14 +24,17 @@ namespace GeolocationProcessing
     {
         private StateMachine _stateMachine;
         private LinearState _linearState;
+        private LogState _logState;
+        private Geolocation _geolocation;
 
         public MainWindow()
         {
             InitializeComponent();
             _stateMachine = new StateMachine();
             _linearState = new LinearState(this, _stateMachine);
+            _logState = new LogState(this, _stateMachine);
 
-            _stateMachine.Initialize(_linearState);
+            _stateMachine.Initialize(_logState);
         }
 
         private void BroseFileButton_Click(object sender, RoutedEventArgs e)
@@ -40,20 +43,28 @@ namespace GeolocationProcessing
             if (openFileDialog.ShowDialog() == true)
             {
                 string selectedFileName = openFileDialog.FileName;
-                var geo = new Geolocation(selectedFileName);
-                var bitmap = geo.CreateImage(8, _stateMachine.CurrentState); // TODO ввод количества потоков.
+                _geolocation = new Geolocation(selectedFileName);
+                ShowGeoImage();
+            }
+        }
 
-                using (MemoryStream memory = new MemoryStream())
-                {
-                    bitmap.Save(memory, ImageFormat.Png);
-                    memory.Position = 0;
-                    BitmapImage bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.StreamSource = memory;
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.EndInit();
-                    ResultImage.Source = bitmapImage;
-                }
+        private void ShowGeoImage()
+        {
+            if (_geolocation == null)
+                return;
+
+            var bitmap = _geolocation.CreateImage(8, _stateMachine.CurrentState); // TODO ввод количества потоков.
+
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, ImageFormat.Png);
+                memory.Position = 0;
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                ResultImage.Source = bitmapImage;
             }
         }
 
@@ -72,11 +83,6 @@ namespace GeolocationProcessing
             }
         }
 
-        private void Exit_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
         private void Benchmark_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -93,12 +99,12 @@ namespace GeolocationProcessing
                     geo.CreateImage(i, _stateMachine.CurrentState);
                     watch.Stop();
                     result.AppendLine
-                        (
-                            $"Кол-во потоков - {i}; " +
-                            $"Время выполнения в миллисекундах - {watch.ElapsedMilliseconds}; " +
-                            $"Время выполнения в секундах  - {watch.Elapsed.Seconds}; " +
-                            $"Время выполнения в тиках  - {watch.ElapsedTicks}; "
-                        );
+                    (
+                        $"Кол-во потоков - {i}; " +
+                        $"Время выполнения в миллисекундах - {watch.ElapsedMilliseconds}; " +
+                        $"Время выполнения в секундах  - {watch.Elapsed.Seconds}; " +
+                        $"Время выполнения в тиках  - {watch.ElapsedTicks}; "
+                    );
                 }
 
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -112,6 +118,26 @@ namespace GeolocationProcessing
                     textWriter.Close();
                 }
             }
+        }
+
+        private void OnLinearButtonClick(object sender, RoutedEventArgs e)
+        {
+            _stateMachine.ChangeState(_linearState);
+        }
+
+        private void OnLogButtonClick(object sender, RoutedEventArgs e)
+        {
+            _stateMachine.ChangeState(_logState);
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void Update_Click(object sender, RoutedEventArgs e)
+        {
+            ShowGeoImage();
         }
     }
 }
