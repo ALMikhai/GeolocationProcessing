@@ -22,6 +22,7 @@
             <MenuItem Header="File" Height="25">
                 <MenuItem Header="Open" Click="BroseFileButton_Click"/>
                 <MenuItem Header="SaveImage" Click="SaveImage_Click"/>
+                <MenuItem Header="Benchmark" Click="Benchmark_Click"/>
                 <Separator/>
                 <MenuItem Header="Exit" Click="Exit_Click"/>
             </MenuItem>

@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace GeolocationProcessing
 {
@@ -32,7 +33,7 @@ namespace GeolocationProcessing
             {
                 string selectedFileName = openFileDialog.FileName;
                 var geo = new Geolocation(selectedFileName);
-                var bitmap = geo.CreateImage(16);
+                var bitmap = geo.CreateImage(8); // TODO ввод количества потоков.
 
                 using (MemoryStream memory = new MemoryStream())
                 {
@@ -66,6 +67,43 @@ namespace GeolocationProcessing
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void Benchmark_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string selectedFileName = openFileDialog.FileName;
+                var geo = new Geolocation(selectedFileName);
+                StringBuilder result = new StringBuilder();
+                
+                for (int i = 1; i <= 16; i++)
+                {
+                    Stopwatch watch = new Stopwatch();
+                    watch.Start();
+                    geo.CreateImage(i);
+                    watch.Stop();
+                    result.AppendLine
+                        (
+                            $"Кол-во потоков - {i}; " +
+                            $"Время выполнения в миллисекундах - {watch.ElapsedMilliseconds}; " +
+                            $"Время выполнения в секундах  - {watch.Elapsed.Seconds}; " +
+                            $"Время выполнения в тиках  - {watch.ElapsedTicks}; "
+                        );
+                }
+
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "TxT Files(*.TXT)|*.TXT";
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    TextWriter textWriter = new StreamWriter(filePath);
+                    textWriter.Write(result.ToString());
+                    textWriter.Close();
+                }
+            }
         }
     }
 }
