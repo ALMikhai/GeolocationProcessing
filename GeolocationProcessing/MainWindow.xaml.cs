@@ -16,14 +16,22 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using GeolocationProcessing.SM;
 
 namespace GeolocationProcessing
 {
     public partial class MainWindow : Window
     {
+        private StateMachine _stateMachine;
+        private LinearState _linearState;
+
         public MainWindow()
         {
             InitializeComponent();
+            _stateMachine = new StateMachine();
+            _linearState = new LinearState(this, _stateMachine);
+
+            _stateMachine.Initialize(_linearState);
         }
 
         private void BroseFileButton_Click(object sender, RoutedEventArgs e)
@@ -33,7 +41,7 @@ namespace GeolocationProcessing
             {
                 string selectedFileName = openFileDialog.FileName;
                 var geo = new Geolocation(selectedFileName);
-                var bitmap = geo.CreateImage(8); // TODO ввод количества потоков.
+                var bitmap = geo.CreateImage(8, _stateMachine.CurrentState); // TODO ввод количества потоков.
 
                 using (MemoryStream memory = new MemoryStream())
                 {
@@ -82,7 +90,7 @@ namespace GeolocationProcessing
                 {
                     Stopwatch watch = new Stopwatch();
                     watch.Start();
-                    geo.CreateImage(i);
+                    geo.CreateImage(i, _stateMachine.CurrentState);
                     watch.Stop();
                     result.AppendLine
                         (

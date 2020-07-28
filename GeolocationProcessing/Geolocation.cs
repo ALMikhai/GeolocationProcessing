@@ -8,21 +8,27 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using GeolocationProcessing.SM;
 
 namespace GeolocationProcessing
 {
+    public enum FilterType
+    {
+        LINEAR,
+        LOG,
+        // TODO...
+    }
+
     class Geolocation
     {
         private GeolocationData _data;
-        private object _locker;
 
         public Geolocation(string path)
         {
             _data = new GeolocationData(path);
-            _locker = new object();
         }
 
-        public Bitmap CreateImage(int threadNumber)
+        public Bitmap CreateImage(int threadNumber, State currentState)
         {
             var result = new Bitmap(_data.GetWidth(), _data.GetHeight(), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             var bitmapData = result.LockBits(new Rectangle(0, 0, _data.GetWidth(), _data.GetHeight()), System.Drawing.Imaging.ImageLockMode.ReadWrite, result.PixelFormat);
@@ -37,7 +43,7 @@ namespace GeolocationProcessing
                 int from = (_data.GetHeight() / threadNumber) * i;
                 int to = (_data.GetHeight() / threadNumber) * (i + 1);
 
-                ImagePart imagePart = new ImagePart(_data, from, to, result, _locker, buffer, depth);
+                ImagePart imagePart = new ImagePart(_data, from, to, buffer, depth, currentState);
 
                 if (i == threadNumber - 1)
                 {
@@ -66,23 +72,21 @@ namespace GeolocationProcessing
 
     class ImagePart
     {
-        private Bitmap _bitmap;
         private GeolocationData _data;
         private int _from = 0;
         private int _to = 0;
-        private object _locker;
         private byte[] _buffer;
         private int _depth;
+        private State _currentState;
 
-        public ImagePart(GeolocationData data, int from, int to, Bitmap bitmap, object locker, byte[] buffer, int depth)
+        public ImagePart(GeolocationData data, int from, int to, byte[] buffer, int depth, State currentState)
         {
             _data = data;
             _from = from;
             _to = to;
-            _bitmap = bitmap;
-            _locker = locker;
             _depth = depth;
             _buffer = buffer;
+            _currentState = currentState;
         }
 
         public void Process()
@@ -93,7 +97,7 @@ namespace GeolocationProcessing
                 for (int j = 0; j < _data.GetWidth(); j++)
                 {
                     var offset = ((i * _data.GetWidth()) + j) * _depth;
-                    int pixelColor = Convert.ToInt32(255 * Math.Log10(9 * _data.Data[i][j] / maxInLine + 1)) % 256;
+                    int pixelColor = _currentState.Process(_data.Data[i][j], maxInLine);
                     _buffer[offset + 0] = _buffer[offset + 1] = _buffer[offset + 2] = (byte)pixelColor;
                 }
             }
