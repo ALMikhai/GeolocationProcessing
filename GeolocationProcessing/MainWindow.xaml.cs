@@ -32,7 +32,7 @@ namespace GeolocationProcessing
             {
                 string selectedFileName = openFileDialog.FileName;
                 var geo = new Geolocation(selectedFileName);
-                var bitmap = geo.CreateImage();
+                var bitmap = geo.CreateImage(16);
 
                 using (MemoryStream memory = new MemoryStream())
                 {
