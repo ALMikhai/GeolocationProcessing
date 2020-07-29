@@ -17,6 +17,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using GeolocationProcessing.SM;
+using OxyPlot.Wpf;
+using OxyPlot;
 
 namespace GeolocationProcessing
 {
@@ -34,7 +36,7 @@ namespace GeolocationProcessing
             _linearState = new LinearState(this, _stateMachine);
             _logState = new LogState(this, _stateMachine);
 
-            _stateMachine.Initialize(_logState);
+            _stateMachine.Initialize(_linearState);
         }
 
         private void BroseFileButton_Click(object sender, RoutedEventArgs e)
@@ -44,11 +46,11 @@ namespace GeolocationProcessing
             {
                 string selectedFileName = openFileDialog.FileName;
                 _geolocation = new Geolocation(selectedFileName);
-                ShowGeoImage();
+                UpdateGeoImage();
             }
         }
 
-        private void ShowGeoImage()
+        private void UpdateGeoImage()
         {
             if (_geolocation == null)
                 return;
@@ -57,7 +59,7 @@ namespace GeolocationProcessing
 
             using (MemoryStream memory = new MemoryStream())
             {
-                bitmap.Save(memory, ImageFormat.Png);
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
                 memory.Position = 0;
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
@@ -137,7 +139,18 @@ namespace GeolocationProcessing
 
         private void Update_Click(object sender, RoutedEventArgs e)
         {
-            ShowGeoImage();
+            UpdateGeoImage();
+        }
+
+        private void ShowChart_Click(object sender, RoutedEventArgs e)
+        {
+            if (_geolocation == null)
+                return;
+
+            ColorsChartModel.Data = _geolocation.GetChartData();
+            ColorsChartModel.Description = _stateMachine.CurrentState.GetDescription();
+            var chartWindow = new ColorsChart();
+            chartWindow.Show();
         }
     }
 }

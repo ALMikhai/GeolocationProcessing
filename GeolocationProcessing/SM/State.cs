@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace GeolocationProcessing.SM
 {
@@ -21,6 +22,8 @@ namespace GeolocationProcessing.SM
         }
 
         public virtual void Enter() { }
+
+        public virtual string GetDescription() { return ""; }
 
         public virtual int Process(double num, double maxNum) 
         {

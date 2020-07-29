@@ -8,30 +8,26 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using GeolocationProcessing.SM;
 
 namespace GeolocationProcessing
 {
-    public enum FilterType
-    {
-        LINEAR,
-        LOG,
-        // TODO...
-    }
-
     class Geolocation
     {
         private GeolocationData _data;
+        private Bitmap _bitmap;
 
         public Geolocation(string path)
         {
             _data = new GeolocationData(path);
+            _bitmap = new Bitmap(1, 1);
         }
 
         public Bitmap CreateImage(int threadNumber, State currentState)
         {
-            var result = new Bitmap(_data.GetWidth(), _data.GetHeight(), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            var bitmapData = result.LockBits(new Rectangle(0, 0, _data.GetWidth(), _data.GetHeight()), System.Drawing.Imaging.ImageLockMode.ReadWrite, result.PixelFormat);
+            _bitmap = new Bitmap(_data.GetWidth(), _data.GetHeight(), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            var bitmapData = _bitmap.LockBits(new Rectangle(0, 0, _data.GetWidth(), _data.GetHeight()), System.Drawing.Imaging.ImageLockMode.ReadWrite, _bitmap.PixelFormat);
             var depth = Bitmap.GetPixelFormatSize(bitmapData.PixelFormat) / 8;
             
             var buffer = new byte[_data.GetWidth() * _data.GetHeight() * depth];
@@ -64,7 +60,27 @@ namespace GeolocationProcessing
 
             Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
 
-            result.UnlockBits(bitmapData);
+            _bitmap.UnlockBits(bitmapData);
+
+            return _bitmap;
+        }
+
+        public int[] GetChartData()
+        {
+            var result = new int[256];
+            //var bitmapData = _bitmap.LockBits(new Rectangle(0, 0, _data.GetWidth(), _data.GetHeight()), System.Drawing.Imaging.ImageLockMode.ReadWrite, _bitmap.PixelFormat);
+            //var depth = Bitmap.GetPixelFormatSize(bitmapData.PixelFormat) / 8;
+
+            //var buffer = new int[_data.GetWidth() * _data.GetHeight() * depth];
+            //Marshal.Copy(bitmapData.Scan0, 0, buffer, buffer.Length);
+
+            for (int i = 0; i < _bitmap.Width; i++)
+            {
+                for (int j = 0; j < _bitmap.Height; j++)
+                {
+                    result[_bitmap.GetPixel(i, j).R]++;
+                }
+            }
 
             return result;
         }

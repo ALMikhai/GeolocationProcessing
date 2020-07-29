@@ -31,10 +31,13 @@
                 <MenuItem Header="Log" Click="OnLogButtonClick"/>
             </MenuItem>
             <MenuItem Header="Update image" Click="Update_Click"/>
+            <MenuItem Header="Show chart" Click="ShowChart_Click"/>
         </Menu>
 
         <Border Background="WhiteSmoke" BorderBrush="Black" BorderThickness="2" Grid.RowSpan="2" HorizontalAlignment="Right" Width="274" Margin="0,25,0,0">
-            <StackPanel x:Name="ToolsPanel" Margin="20"/>
+            <StackPanel x:Name="ToolsPanel" Margin="20">
+
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

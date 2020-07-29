@@ -14,7 +14,6 @@ namespace GeolocationProcessing.Utils
 
         public DoubleTextBox()
         {
-            Text = "0";
             MaxLength = 15;
             PreviewTextInput += NumberValidationTextBox;
             TextChanged += OnTextBoxChange;

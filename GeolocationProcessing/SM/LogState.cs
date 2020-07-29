@@ -23,6 +23,7 @@ namespace GeolocationProcessing.SM
                 Margin = new System.Windows.Thickness(_standartMargine),
                 Height = _standartHeight,
                 TextAlignment = System.Windows.TextAlignment.Center,
+                Text = "1"
             };
 
             _additionToMaxlabel = new Label()
@@ -38,6 +39,7 @@ namespace GeolocationProcessing.SM
                 Margin = new System.Windows.Thickness(_standartMargine),
                 Height = _standartHeight,
                 TextAlignment = System.Windows.TextAlignment.Center,
+                Text = "2"
             };
 
             _logBaseLabel = new Label()
@@ -62,6 +64,11 @@ namespace GeolocationProcessing.SM
         {
             var x = (_logBase.Value - 1) / (maxNum * _additionToMax.Value) * num + 1;
             return Convert.ToInt32(Math.Log(x, _logBase.Value) * 255.0);
+        }
+
+        public override string GetDescription()
+        {
+            return $"Logarithm filter; Addition to max = {_additionToMax.Value}; Logarithm base = {_logBase.Value}";
         }
     }
 }

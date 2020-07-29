@@ -22,6 +22,7 @@ namespace GeolocationProcessing.SM
                 Margin = new System.Windows.Thickness(_standartMargine),
                 Height = _standartHeight,
                 TextAlignment = System.Windows.TextAlignment.Center,
+                Text = "1"
             };
 
             _label = new Label()
@@ -42,6 +43,11 @@ namespace GeolocationProcessing.SM
         public override int Process(double num, double maxNum)
         {
             return Convert.ToInt32(num / (maxNum * _additionToMax.Value) * 255.0);
+        }
+
+        public override string GetDescription()
+        {
+            return $"Linear filter; Addition to max = {_additionToMax.Value}";
         }
     }
 }
