@@ -25,17 +25,28 @@ namespace GeolocationProcessing
 
         private PlotModel Create()
         {
-            var model = new PlotModel { Title = Description };
+            var model = new PlotModel();
 
             var columnItems = new List<ColumnItem>();
             var categoryItems = new List<string>();
 
             double sum = Data.Sum();
+            double errorPercent = 0.0;
+            double minError = 100.0;
+            double maxError = 0.0;
+            double bestValue = 100.0 / 256.0;
 
             for (int i = 0; i < 256; i++)
             {
                 categoryItems.Add(i.ToString());
-                columnItems.Add(new ColumnItem { Value = (Data[i] / sum * 100.0) });
+                var value = Data[i] / sum * 100.0;
+                var error = Math.Abs(bestValue - value) / bestValue;
+                if (error < minError)
+                    minError = error;
+                if (error > maxError)
+                    maxError = error;
+                errorPercent += error;
+                columnItems.Add(new ColumnItem { Value = value });
             }
 
             var columnSeries = new ColumnSeries
@@ -52,6 +63,8 @@ namespace GeolocationProcessing
                 Key = "Axis",
                 ItemsSource = categoryItems
             });
+
+            model.Title = Description + $"; Error percent = {errorPercent / 256.0}; Max error percent = {maxError}; Min error percent = {minError}";
 
             return model;
         }
