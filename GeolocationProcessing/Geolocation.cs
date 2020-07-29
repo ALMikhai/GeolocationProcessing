@@ -21,7 +21,6 @@ namespace GeolocationProcessing
         public Geolocation(string path)
         {
             _data = new GeolocationData(path);
-            _bitmap = new Bitmap(1, 1);
         }
 
         public Bitmap CreateImage(int threadNumber, State currentState)
@@ -68,11 +67,6 @@ namespace GeolocationProcessing
         public int[] GetChartData()
         {
             var result = new int[256];
-            //var bitmapData = _bitmap.LockBits(new Rectangle(0, 0, _data.GetWidth(), _data.GetHeight()), System.Drawing.Imaging.ImageLockMode.ReadWrite, _bitmap.PixelFormat);
-            //var depth = Bitmap.GetPixelFormatSize(bitmapData.PixelFormat) / 8;
-
-            //var buffer = new int[_data.GetWidth() * _data.GetHeight() * depth];
-            //Marshal.Copy(bitmapData.Scan0, 0, buffer, buffer.Length);
 
             for (int i = 0; i < _bitmap.Width; i++)
             {
