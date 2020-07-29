@@ -27,6 +27,9 @@ namespace GeolocationProcessing
         private StateMachine _stateMachine;
         private LinearState _linearState;
         private LogState _logState;
+        private PowerState _powerState;
+        private CustomState _customState;
+
         private Geolocation _geolocation;
 
         public MainWindow()
@@ -35,6 +38,8 @@ namespace GeolocationProcessing
             _stateMachine = new StateMachine();
             _linearState = new LinearState(this, _stateMachine);
             _logState = new LogState(this, _stateMachine);
+            _powerState = new PowerState(this, _stateMachine);
+            _customState = new CustomState(this, _stateMachine);
 
             _stateMachine.Initialize(_linearState);
         }
@@ -130,6 +135,16 @@ namespace GeolocationProcessing
         private void OnLogButtonClick(object sender, RoutedEventArgs e)
         {
             _stateMachine.ChangeState(_logState);
+        }
+
+        private void OnPowButtonClick(object sender, RoutedEventArgs e)
+        {
+            _stateMachine.ChangeState(_powerState);
+        }
+
+        private void OnCustomButtonClick(object sender, RoutedEventArgs e)
+        {
+            _stateMachine.ChangeState(_customState);
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)

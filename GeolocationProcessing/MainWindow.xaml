@@ -29,6 +29,8 @@
             <MenuItem Header="Filter" Height="25">
                 <MenuItem Header="Linear" Click="OnLinearButtonClick"/>
                 <MenuItem Header="Log" Click="OnLogButtonClick"/>
+                <MenuItem Header="Pow" Click="OnPowButtonClick"/>
+                <MenuItem Header="Custom" Click="OnCustomButtonClick"/>
             </MenuItem>
             <MenuItem Header="Update image" Click="Update_Click"/>
             <MenuItem Header="Show chart" Click="ShowChart_Click"/>

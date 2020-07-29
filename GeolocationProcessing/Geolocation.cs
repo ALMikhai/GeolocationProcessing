@@ -38,14 +38,16 @@ namespace GeolocationProcessing
                 int from = (_data.GetHeight() / threadNumber) * i;
                 int to = (_data.GetHeight() / threadNumber) * (i + 1);
 
-                ImagePart imagePart = new ImagePart(_data, from, to, buffer, depth, currentState);
+                ImagePart imagePart;
 
                 if (i == threadNumber - 1)
                 {
+                    imagePart = new ImagePart(_data, from, _data.GetHeight(), buffer, depth, currentState);
                     imagePart.Process();
                 }
                 else
                 {
+                    imagePart = new ImagePart(_data, from, to, buffer, depth, currentState);
                     Thread thread = new Thread(new ThreadStart(imagePart.Process));
                     thread.Start();
                     threads.Add(thread);
