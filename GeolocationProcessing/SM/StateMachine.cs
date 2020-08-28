@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GeolocationProcessing.SM
 {
-    class StateMachine
+    public class StateMachine
     {
         public State CurrentState;
 

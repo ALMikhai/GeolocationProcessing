@@ -55,6 +55,7 @@ namespace GeolocationProcessing
                 LabelPlacement = LabelPlacement.Inside,
                 LabelFormatString = "{0:.00}%"
             };
+
             model.Series.Add(columnSeries);
 
             model.Axes.Add(new CategoryAxis

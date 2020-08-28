@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace GeolocationProcessing.SM
 {
-    class State
+    public class State
     {
         protected MainWindow _mainWindow;
         protected StateMachine _stateMachine;

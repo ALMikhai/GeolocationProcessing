@@ -16,6 +16,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using System.Threading;
+using System.Windows.Threading;
 using GeolocationProcessing.SM;
 using OxyPlot.Wpf;
 using OxyPlot;
@@ -31,6 +33,9 @@ namespace GeolocationProcessing
         private CustomState _customState;
 
         private Geolocation _geolocation;
+        private string _lastFileName;
+
+        public delegate void RenderImage(MemoryStream image);
 
         public MainWindow()
         {
@@ -42,15 +47,17 @@ namespace GeolocationProcessing
             _customState = new CustomState(this, _stateMachine);
 
             _stateMachine.Initialize(_linearState);
+            ProcessingPopup.Visibility = Visibility.Hidden;
         }
 
-        private void BroseFileButton_Click(object sender, RoutedEventArgs e)
+        private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
                 string selectedFileName = openFileDialog.FileName;
-                _geolocation = new Geolocation(selectedFileName);
+                _lastFileName = selectedFileName;
+                _geolocation = null;
                 UpdateGeoImage();
             }
         }
@@ -58,35 +65,64 @@ namespace GeolocationProcessing
         private void UpdateGeoImage()
         {
             if (_geolocation == null)
-                return;
-
-            var bitmap = _geolocation.CreateImage(8, _stateMachine.CurrentState); // TODO ввод количества потоков.
-
-            using (MemoryStream memory = new MemoryStream())
             {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
-                memory.Position = 0;
-                BitmapImage bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = memory;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                ResultImage.Source = bitmapImage;
+                if (string.IsNullOrEmpty(_lastFileName))
+                {
+                    return;
+                }
             }
+
+            ProcessingPopup.Visibility = Visibility.Visible;
+
+            var thread = new Thread(new ThreadStart(Processing));
+            thread.Start();
+        }
+
+        private void Processing()
+        {
+            if (_geolocation == null)
+            {
+                _geolocation = new Geolocation(_lastFileName);
+            }
+
+            var bitmap = _geolocation.CreateImage(8, _stateMachine.CurrentState);
+
+            MemoryStream memory = new MemoryStream();
+            
+            bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
+            memory.Position = 0;
+
+            ResultImage.Dispatcher.BeginInvoke(
+                DispatcherPriority.Normal,
+                new RenderImage(SetImage),
+                memory
+            );
+        }
+
+        private void SetImage(MemoryStream stream)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = stream;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+
+            ResultImage.Source = bitmapImage;
+            ProcessingPopup.Visibility = Visibility.Hidden;
+            stream.Dispose();
         }
 
         private void SaveImage_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Image Files(*.JPG)|*.JPG";
+            SaveFileDialog saveFileDialog = new SaveFileDialog {Filter = "Image Files(*.JPG)|*.JPG"};
 
             if (saveFileDialog.ShowDialog() == true)
             {
                 string filePath = saveFileDialog.FileName;
                 var encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create((BitmapSource)ResultImage.Source));
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                encoder.Save(stream);
+                using (FileStream stream = new FileStream(filePath, FileMode.Create)) 
+                    encoder.Save(stream);
             }
         }
 
@@ -114,8 +150,7 @@ namespace GeolocationProcessing
                     );
                 }
 
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "TxT Files(*.TXT)|*.TXT";
+                SaveFileDialog saveFileDialog = new SaveFileDialog {Filter = "TxT Files(*.TXT)|*.TXT"};
 
                 if (saveFileDialog.ShowDialog() == true)
                 {

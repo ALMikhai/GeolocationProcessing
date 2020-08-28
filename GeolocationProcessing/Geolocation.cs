@@ -13,7 +13,7 @@ using GeolocationProcessing.SM;
 
 namespace GeolocationProcessing
 {
-    class Geolocation
+    public class Geolocation
     {
         private GeolocationData _data;
         private Bitmap _bitmap;
